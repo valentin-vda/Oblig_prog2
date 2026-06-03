@@ -1,9 +1,11 @@
 package uy.edu.um.doors;
 
 
+import uy.edu.um.entities.Eventos;
 import uy.edu.um.entities.Proceso;
 import uy.edu.um.entities.Usuario;
 import uy.edu.um.tad.heap.MyHeapImpl;
+import uy.edu.um.tad.list.MyLinkedListImpl;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
@@ -44,7 +46,25 @@ public class ProcessManagerImpl implements ProcessManager{
             String linea;
             boolean primera = true;
             while ((linea = br2.readLine())!= null){
-                if (primera == true) {}
+                if (primera == true) {primera = false; continue; }
+                String[] separacion = linea.split(";");
+
+                int pid = Integer.parseInt(separacion[0]);
+                int uid = Integer.parseInt(separacion[1]);
+                String nombre = separacion[2];
+
+                String sinllave = separacion[4].replace("{","").replace("}","");
+                String[] eventos = sinllave.split("#");
+                MyLinkedListImpl<Eventos> listaEventos = new MyLinkedListImpl<>();
+
+                for (int i=0; i < eventos.length; i++){
+                    String[] datos = eventos[i].split(":");
+                    Eventos.TipoEvento tipo = Eventos.TipoEvento.valueOf(datos[0]);
+                    String desc = datos[1];
+                    listaEventos.add(new Eventos(tipo, desc));
+                }
+                procesosNuevos.enqueue(new Proceso(pid, uid, nombre, listaEventos));
+                //Pasar el uid a Usuario
             }
         }
         catch (IOException e) {throw new RuntimeException(e);}
