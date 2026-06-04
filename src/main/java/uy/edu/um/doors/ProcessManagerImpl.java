@@ -20,7 +20,7 @@ public class ProcessManagerImpl implements ProcessManager{
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
     private MyHashImpl<Integer, Usuario> usuarios = new MyHashImpl<>();
     private MyQueueImpl<Proceso> procesosNuevos = new MyQueueImpl();
-    private MyHeapImpl<Proceso> porcesosProsesando= new MyHeapImpl<>();
+    private MyHeapImpl<Proceso> procesosProsesando= new MyHeapImpl<>();
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
 

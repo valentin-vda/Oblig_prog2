@@ -18,6 +18,8 @@ public class Proceso implements Comparable<Proceso> {
         this.propietario = u;
         this.nombre = nombre;
         this.eventos = eventos;
+        this.tipoEstado = TipoEstado.NEW;
+
 
     }
 
