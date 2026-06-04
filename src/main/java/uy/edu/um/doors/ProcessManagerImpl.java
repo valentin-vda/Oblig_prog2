@@ -73,7 +73,33 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void prepareProcesses() {
-        System.out.println("IMPLEMENTAR");
+        if (procesosNuevos.size()!= 0) {
+            for (int i = 0; i < procesosNuevos.size(); i++) {
+                int cantCPU = 0;
+                int cantRAM = 0;
+                int cantDISK = 0;
+
+                Proceso p = procesosNuevos.dequeue();
+                MyLinkedListImpl<Eventos> e = p.getEventos();
+                for (int j=0; j < e.size(); j++){
+                    Eventos even = e.get(j);
+                    switch (even.getTipoEvento()){
+                        case Eventos.TipoEvento.CPU:{cantCPU+=1;}
+                        case Eventos.TipoEvento.RAM:{cantRAM+=1;}
+                        case Eventos.TipoEvento.DISC:{cantDISK+=1;}
+
+                    }
+                }
+                int w = 1;
+                if (p.getPropietario().getTipo() == Usuario.TipoUsuario.ADMIN) {w = 32;}
+                else {w = 16;}
+
+                //Hay que ver si es int o otro tipo de dato
+                int prio = ((8*cantCPU + 2*cantRAM + 2*cantDISK)/e.size()) + w*e.size();
+                p.setPrioridad(prio);
+                procesosProsesando.insert(p);
+            }
+        }else {System.out.println("NO HAY PROCESOS PARA PREPARAR");}
     }
 
     @Override
