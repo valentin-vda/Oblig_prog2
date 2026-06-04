@@ -24,6 +24,7 @@ public class ProcessManagerImpl implements ProcessManager{
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
 
+    //Hay que preguntar por casos particulares sizes 0 y demas
     @Override
     public void loadProcessAndUserData(String processCsvPath, String usersCsvPath) {
         try (BufferedReader br = new BufferedReader(new FileReader(usersCsvPath))){
@@ -84,9 +85,9 @@ public class ProcessManagerImpl implements ProcessManager{
                 for (int j=0; j < e.size(); j++){
                     Eventos even = e.get(j);
                     switch (even.getTipoEvento()){
-                        case Eventos.TipoEvento.CPU:{cantCPU+=1;}
-                        case Eventos.TipoEvento.RAM:{cantRAM+=1;}
-                        case Eventos.TipoEvento.DISC:{cantDISK+=1;}
+                        case Eventos.TipoEvento.CPU:{cantCPU+=1; break;}
+                        case Eventos.TipoEvento.RAM:{cantRAM+=1; break;}
+                        case Eventos.TipoEvento.DISC:{cantDISK+=1;break;}
 
                     }
                 }
