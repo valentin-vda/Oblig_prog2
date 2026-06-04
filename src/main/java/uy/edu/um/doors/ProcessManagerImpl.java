@@ -4,6 +4,7 @@ package uy.edu.um.doors;
 import uy.edu.um.entities.Eventos;
 import uy.edu.um.entities.Proceso;
 import uy.edu.um.entities.Usuario;
+import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
 import uy.edu.um.tad.queue.MyQueueImpl;
@@ -17,7 +18,7 @@ import java.io.IOException;
 public class ProcessManagerImpl implements ProcessManager{
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
-    // private MyHashImpl<ACA VA ALGO> usuarios = new MyHashImpl<>();
+    private MyHashImpl<Integer, Usuario> usuarios = new MyHashImpl<>();
     private MyQueueImpl<Proceso> procesosNuevos = new MyQueueImpl();
     private MyHeapImpl<Proceso> porcesosProsesando= new MyHeapImpl<>();
     private Proceso running = null;
@@ -35,8 +36,8 @@ public class ProcessManagerImpl implements ProcessManager{
                 int uid = Integer.parseInt(separacion[0]);
                 String alias = separacion[1];
                 Usuario.TipoUsuario tipo = Usuario.TipoUsuario.valueOf(separacion[2]);
-                new Usuario(uid, alias, tipo);
-                // hay que añadir el usuario al hash
+                Usuario u = new Usuario(uid, alias, tipo);
+                usuarios.put(uid, u);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,8 +64,8 @@ public class ProcessManagerImpl implements ProcessManager{
                     String desc = datos[1];
                     listaEventos.add(new Eventos(tipo, desc));
                 }
-                procesosNuevos.enqueue(new Proceso(pid, uid, nombre, listaEventos));
-                //Pasar el uid a Usuario
+                Usuario u = usuarios.get(uid);
+                procesosNuevos.enqueue(new Proceso(pid, u, nombre, listaEventos));
             }
         }
         catch (IOException e) {throw new RuntimeException(e);}
