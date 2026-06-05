@@ -7,6 +7,7 @@ import uy.edu.um.entities.Usuario;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
+import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
@@ -73,13 +74,13 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void prepareProcesses() {
-        if (procesosNuevos.size()!= 0) {
+    public void prepareProcesses() throws EmptyQueueException {
+        if (!procesosNuevos.isEmpty()) {
             for (int i = 0; i < procesosNuevos.size(); i++) {
                 int cantCPU = 0;
                 int cantRAM = 0;
                 int cantDISK = 0;
-
+                if (procesosNuevos.isEmpty()) throw new EmptyQueueException();
                 Proceso p = procesosNuevos.dequeue();
                 MyLinkedListImpl<Eventos> e = p.getEventos();
                 for (int j=0; j < e.size(); j++){
