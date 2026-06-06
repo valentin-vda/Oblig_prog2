@@ -4,9 +4,11 @@ package uy.edu.um.doors;
 import uy.edu.um.entities.Eventos;
 import uy.edu.um.entities.Proceso;
 import uy.edu.um.entities.Usuario;
+import uy.edu.um.exceptions.ProcessAlreadyRunningException;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
+import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
@@ -14,6 +16,7 @@ import uy.edu.um.tad.stack.MyStackImpl;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 
 public class ProcessManagerImpl implements ProcessManager{
 
@@ -73,13 +76,13 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void prepareProcesses() {
+    public void prepareProcesses() throws EmptyQueueException{
         if (procesosNuevos.size()!= 0) {
             for (int i = 0; i < procesosNuevos.size(); i++) {
                 int cantCPU = 0;
                 int cantRAM = 0;
                 int cantDISK = 0;
-
+                if (procesosNuevos.isEmpty()) throw new EmptyQueueException();
                 Proceso p = procesosNuevos.dequeue();
                 MyLinkedListImpl<Eventos> e = p.getEventos();
                 for (int j=0; j < e.size(); j++){
@@ -104,8 +107,14 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void executeNextProcess() {
-        System.out.println("IMPLEMENTAR");
+    public void executeNextProcess() throws ProcessAlreadyRunningException, EmptyQueueException{
+        if (running != null) {
+            throw new ProcessAlreadyRunningException(running.getNombre());
+        }
+        if (procesosProsesando.isEmpty()){
+            throw new EmptyQueueException();
+        }
+        running = procesosProsesando.remove();
     }
 
     @Override
