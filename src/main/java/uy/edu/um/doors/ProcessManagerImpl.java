@@ -4,6 +4,7 @@ package uy.edu.um.doors;
 import uy.edu.um.entities.Eventos;
 import uy.edu.um.entities.Proceso;
 import uy.edu.um.entities.Usuario;
+import uy.edu.um.exceptions.ProcesoSinEventos;
 import uy.edu.um.exceptions.ProcessAlreadyRunningException;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
@@ -13,9 +14,9 @@ import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class ProcessManagerImpl implements ProcessManager{
@@ -26,6 +27,14 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyHeapImpl<Proceso> procesosProsesando= new MyHeapImpl<>();
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
+
+
+    private void escribirLog(String cont){
+        String ruta = "uy/edu/um/log.txt";
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ruta, true))){pw.println(cont);}
+        catch (IOException e) { throw new RuntimeException(e);}
+    }
+
 
     //Hay que preguntar por casos particulares sizes 0 y demas
     @Override
@@ -58,7 +67,7 @@ public class ProcessManagerImpl implements ProcessManager{
                 int uid = Integer.parseInt(separacion[1]);
                 String nombre = separacion[2];
 
-                String sinllave = separacion[4].replace("{","").replace("}","");
+                String sinllave = separacion[3].replace("{","").replace("}","");
                 String[] eventos = sinllave.split("#");
                 MyLinkedListImpl<Eventos> listaEventos = new MyLinkedListImpl<>();
 
@@ -80,7 +89,7 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void prepareProcesses() throws EmptyQueueException {
+    public void prepareProcesses() throws EmptyQueueException, ProcesoSinEventos{
         if (!procesosNuevos.isEmpty()) {
             for (int i = 0; i < procesosNuevos.size(); i++) {
                 int cantCPU = 0;
@@ -89,6 +98,9 @@ public class ProcessManagerImpl implements ProcessManager{
                 if (procesosNuevos.isEmpty()) throw new EmptyQueueException();
                 Proceso p = procesosNuevos.dequeue();
                 MyLinkedListImpl<Eventos> e = p.getEventos();
+
+                if (e.size() == 0) throw new ProcesoSinEventos();
+
                 for (int j=0; j < e.size(); j++){
                     Eventos even = e.get(j);
                     switch (even.getTipoEvento()){
@@ -102,10 +114,16 @@ public class ProcessManagerImpl implements ProcessManager{
                 if (p.getPropietario().getTipo() == Usuario.TipoUsuario.ADMIN) {w = 32;}
                 else {w = 16;}
 
-                //Hay que ver si es int o otro tipo de dato
+
                 int prio = ((8*cantCPU + 2*cantRAM + 2*cantDISK)/e.size()) + w*e.size();
                 p.setPrioridad(prio);
                 procesosProsesando.insert(p);
+                p.setTipoEstado(Proceso.TipoEstado.PENDING);
+
+                String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+                String log = "["+fechaHora+"]: NEW PENDING PROCESS: PID="+p.getPid()+" | "+p.getNombre()+" | USER:"+p.getPropietario().getTipo()+" UID:"+p.getPropietario().getUid()+" | P="+prio;
+                escribirLog(log);
             }
         }else {System.out.println("NO HAY PROCESOS PARA PREPARAR");}
     }

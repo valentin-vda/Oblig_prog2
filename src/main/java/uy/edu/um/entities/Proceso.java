@@ -25,10 +25,10 @@ public class Proceso implements Comparable<Proceso> {
 
     @Override
     public int compareTo(Proceso o) {
-        if (this.pid > o.pid) {
+        if (this.prioridad > o.getPrioridad()) {
             return 1;
         }
-        if (this.pid < o.pid) {
+        if (this.prioridad < o.getPrioridad()) {
             return -1;
         }
         return 0;
