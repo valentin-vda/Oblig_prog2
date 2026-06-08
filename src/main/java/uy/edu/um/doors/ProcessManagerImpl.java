@@ -34,7 +34,7 @@ public class ProcessManagerImpl implements ProcessManager{
             String linea;
             boolean primera = true;
             while ((linea = br.readLine())!= null){
-                if (primera == true) {primera = false; continue;}
+                if (primera) {primera = false; continue;}
                 String[] separacion = linea.split(";");
 
                 int uid = Integer.parseInt(separacion[0]);
@@ -51,7 +51,7 @@ public class ProcessManagerImpl implements ProcessManager{
             String linea;
             boolean primera = true;
             while ((linea = br2.readLine())!= null){
-                if (primera == true) {primera = false; continue; }
+                if (primera) {primera = false; continue; }
                 String[] separacion = linea.split(";");
 
                 int pid = Integer.parseInt(separacion[0]);
@@ -69,6 +69,10 @@ public class ProcessManagerImpl implements ProcessManager{
                     listaEventos.add(new Eventos(tipo, desc));
                 }
                 Usuario u = usuarios.get(uid);
+                if (u == null) {
+                    System.out.println("Advertencia: no existe el usuario " + uid + " para el proceso " + pid);
+                    continue;
+                }
                 procesosNuevos.enqueue(new Proceso(pid, u, nombre, listaEventos));
             }
         }
@@ -76,8 +80,8 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void prepareProcesses() throws EmptyQueueException{
-        if (procesosNuevos.size()!= 0) {
+    public void prepareProcesses() throws EmptyQueueException {
+        if (!procesosNuevos.isEmpty()) {
             for (int i = 0; i < procesosNuevos.size(); i++) {
                 int cantCPU = 0;
                 int cantRAM = 0;
