@@ -4,6 +4,7 @@ package uy.edu.um.doors;
 import uy.edu.um.entities.Eventos;
 import uy.edu.um.entities.Proceso;
 import uy.edu.um.entities.Usuario;
+import uy.edu.um.exceptions.NingunProcesoEnEjecucion;
 import uy.edu.um.exceptions.ProcesoSinEventos;
 import uy.edu.um.exceptions.ProcessAlreadyRunningException;
 import uy.edu.um.tad.hash.MyHashImpl;
@@ -11,6 +12,7 @@ import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
 import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
+import uy.edu.um.tad.stack.EmptyStackException;
 import uy.edu.um.tad.stack.MyStackImpl;
 
 
@@ -27,6 +29,7 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyHeapImpl<Proceso> procesosProsesando= new MyHeapImpl<>();
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
+    private int capacidad_stack_procesos_finalizados = 10;     //CONSULTAR ESTO
 
 
     private void escribirLog(String cont){
@@ -140,8 +143,28 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void finishProcessOk() {
-        System.out.println("IMPLEMENTAR");
+    public void finishProcessOk() throws EmptyStackException {
+        if (running == null) {
+            throw new NingunProcesoEnEjecucion("");
+        }
+        Proceso terminadoOk = running;
+        terminadoOk.setTipoFinalizacion(Proceso.TipoFinalizacion.OK);
+        running = null;
+        String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+            escribirLog(fechaHora+": Finished process stack overflow");
+            for (int i=0; i < procesosFinalizados.size(); i++) {
+                Proceso aux = procesosFinalizados.pop();
+                String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
+                        "USER:"+aux.getPropietario().getTipo()+" UID:"+aux.getPropietario().getUid()+"";
+                escribirLog(logaux);
+
+            }
+        }
+        procesosFinalizados.push(terminadoOk);
+        String log = "["+fechaHora+"]: ENDING PROCESS: PID="+terminadoOk.getPid()+" |STATE: OK";
+        escribirLog(log);
+        System.out.println("Proceso Terminado OK");
     }
 
     @Override
