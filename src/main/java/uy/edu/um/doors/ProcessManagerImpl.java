@@ -151,8 +151,10 @@ public class ProcessManagerImpl implements ProcessManager{
         terminadoOk.setTipoFinalizacion(Proceso.TipoFinalizacion.OK);
         running = null;
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        //Hay que imprimir todos los procesos finalizados cuando se llena el stack
         if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
             escribirLog(fechaHora+": Finished process stack overflow");
+            //Va imprimiendo en el log los procesos
             for (int i=0; i < procesosFinalizados.size(); i++) {
                 Proceso aux = procesosFinalizados.pop();
                 String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
@@ -161,6 +163,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
             }
         }
+        //Pushea el nuevo proceso terminado
         procesosFinalizados.push(terminadoOk);
         String log = "["+fechaHora+"]: ENDING PROCESS: PID="+terminadoOk.getPid()+" |STATE: OK";
         escribirLog(log);
