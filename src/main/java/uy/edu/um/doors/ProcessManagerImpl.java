@@ -7,6 +7,7 @@ import uy.edu.um.entities.Usuario;
 import uy.edu.um.exceptions.NingunProcesoEnEjecucion;
 import uy.edu.um.exceptions.ProcesoSinEventos;
 import uy.edu.um.exceptions.ProcessAlreadyRunningException;
+import uy.edu.um.exceptions.UsuarioNoEncontrado;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
@@ -29,7 +30,7 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyHeapImpl<Proceso> procesosProsesando= new MyHeapImpl<>();
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
-    private int capacidad_stack_procesos_finalizados = 10;     //CONSULTAR ESTO
+    private int capacidad_stack_procesos_finalizados = 100;     //CONSULTAR ESTO
 
 
     private void escribirLog(String cont){
@@ -153,15 +154,7 @@ public class ProcessManagerImpl implements ProcessManager{
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         //Hay que imprimir todos los procesos finalizados cuando se llena el stack
         if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
-            escribirLog(fechaHora+": Finished process stack overflow");
-            //Va imprimiendo en el log los procesos
-            for (int i=0; i < procesosFinalizados.size(); i++) {
-                Proceso aux = procesosFinalizados.pop();
-                String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
-                        "USER:"+aux.getPropietario().getTipo()+" UID:"+aux.getPropietario().getUid()+"";
-                escribirLog(logaux);
-
-            }
+           printProcesosFinalizados();
         }
         //Pushea el nuevo proceso terminado
         procesosFinalizados.push(terminadoOk);
@@ -169,15 +162,64 @@ public class ProcessManagerImpl implements ProcessManager{
         escribirLog(log);
         System.out.println("Proceso Terminado OK");
     }
-
+    //MUY SIMILAR AL ANTERIOR
     @Override
-    public void finishProcessError() {
-        System.out.println("IMPLEMENTAR");
+    public void finishProcessError() throws EmptyStackException {
+        if (running == null) {
+            throw new NingunProcesoEnEjecucion("");
+        }
+        Proceso terminadoE = running;
+        terminadoE.setTipoFinalizacion(Proceso.TipoFinalizacion.ERROR);
+        running = null;
+        String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        //Hay que imprimir todos los procesos finalizados cuando se llena el stack
+        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+            printProcesosFinalizados();
+        }
+        //Pushea el nuevo proceso terminado
+        procesosFinalizados.push(terminadoE);
+        String log = "["+fechaHora+"]: ENDING PROCESS: PID="+terminadoE.getPid()+" |STATE: ERROR";
+        escribirLog(log);
+        System.out.println("Proceso Terminado ERROR");
     }
 
     @Override
-    public void terminateProcess(int uid) {
-        System.out.println("IMPLEMENTAR");
+    public void terminateProcess(int uid) throws EmptyStackException {
+        if (running == null) {
+            throw new NingunProcesoEnEjecucion("");
+        }
+        Proceso terminated = running;
+        terminated.setTipoFinalizacion(Proceso.TipoFinalizacion.TERMINATED);
+        //Chequea que el usuario terminador exista antes de buscarlo en el hash
+        if (!usuarios.contains(uid)){
+            throw new UsuarioNoEncontrado("El usuario no está registrado");
+        }
+        Usuario terminador = usuarios.get(uid);
+        terminated.setFinalizadoPor(terminador);
+        running = null;
+        String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        //Hay que imprimir todos los procesos finalizados cuando se llena el stack
+        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+            printProcesosFinalizados();
+        }
+        //Pushea el nuevo proceso terminado
+        procesosFinalizados.push(terminated);
+        String log = "["+fechaHora+"]: ENDING PROCESS: PID="+terminated.getPid()+" |STATE: TERMINATED by USER:"+terminador.getAlias()+" UID:"+terminador.getUid();
+        escribirLog(log);
+        System.out.println("Proceso Terminado");
+    }
+
+    public void printProcesosFinalizados() throws EmptyStackException {
+        String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        escribirLog(fechaHora+": Finished process stack overflow");
+        //Va imprimiendo en el log los procesos
+        for (int i=0; i < procesosFinalizados.size(); i++) {
+            Proceso aux = procesosFinalizados.pop();
+            String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
+                    "USER:"+aux.getPropietario().getTipo()+" UID:"+aux.getPropietario().getUid()+"";
+            escribirLog(logaux);
+
+        }
     }
 
     @Override
