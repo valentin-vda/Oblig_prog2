@@ -1,5 +1,7 @@
 package uy.edu.um.entities;
 
+import java.util.Objects;
+
 public class Usuario {
     private int uid;
     private String alias;
@@ -36,5 +38,16 @@ public class Usuario {
 
     public void setTipo(TipoUsuario tipo) {
         this.tipo = tipo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Usuario usuario)) return false;
+        return getUid() == usuario.getUid();
+    }
+
+    @Override
+    public int hashCode() {
+        return uid;
     }
 }

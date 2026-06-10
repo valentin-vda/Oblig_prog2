@@ -27,10 +27,9 @@ public class ProcessManagerImpl implements ProcessManager{
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
     private MyHashImpl<Integer, Usuario> usuarios = new MyHashImpl<>();
     private MyQueueImpl<Proceso> procesosNuevos = new MyQueueImpl();
-    private MyHeapImpl<Proceso> procesosProcesando= new MyHeapImpl<>();
+    private MyHeapImpl<Proceso> procesosProcesando= new MyHeapImpl<>(false);
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
-    private int capacidad_stack_procesos_finalizados = 100;     //CONSULTAR ESTO
 
 
     private void escribirLog(String cont){
@@ -148,14 +147,14 @@ public class ProcessManagerImpl implements ProcessManager{
     @Override
     public void finishProcessOk() throws EmptyStackException {
         if (running == null) {
-            throw new NingunProcesoEnEjecucion("");
+            throw new NingunProcesoEnEjecucion("No hay ningun proceso en ejecución");
         }
         Proceso terminadoOk = running;
         terminadoOk.setTipoFinalizacion(Proceso.TipoFinalizacion.OK);
         running = null;
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         //Hay que imprimir todos los procesos finalizados cuando se llena el stack
-        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+        if (procesosFinalizados.size() == MAX_FINISHED_PROCESS_ON_RAM) {
            printProcesosFinalizados();
         }
         //Pushea el nuevo proceso terminado
@@ -175,7 +174,7 @@ public class ProcessManagerImpl implements ProcessManager{
         running = null;
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         //Hay que imprimir todos los procesos finalizados cuando se llena el stack
-        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+        if (procesosFinalizados.size() == MAX_FINISHED_PROCESS_ON_RAM) {
             printProcesosFinalizados();
         }
         //Pushea el nuevo proceso terminado
@@ -201,7 +200,7 @@ public class ProcessManagerImpl implements ProcessManager{
         running = null;
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         //Hay que imprimir todos los procesos finalizados cuando se llena el stack
-        if (procesosFinalizados.size() == capacidad_stack_procesos_finalizados) {
+        if (procesosFinalizados.size() == MAX_FINISHED_PROCESS_ON_RAM) {
             printProcesosFinalizados();
         }
         //Pushea el nuevo proceso terminado
