@@ -308,6 +308,10 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatusByUser(int uid) {
+        if (!usuarios.contains(uid)){
+            System.out.println("ERROR: Usuario no encontrado");
+            return;
+        }
         System.out.println("PROCESS STATUS");
         System.out.println("EXECUTING:");
         if (running != null) {
@@ -353,10 +357,12 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatusByProcess(int pid) {
+        boolean encontrado = false;
         System.out.println("PROCESS STATUS");
         System.out.println("EXECUTING:");
         if (running != null) {
             if (running.getPid() == pid) {
+                encontrado = true;
                 System.out.println("\tPID=" + running.getPid() + " | " + running.getNombre() + " | USER:" + running.getPropietario().getAlias() + " UID:" + running.getPropietario().getUid() + " | P=" + running.getPrioridad());
             imprimirEventos(running);
             }
@@ -372,6 +378,7 @@ public class ProcessManagerImpl implements ProcessManager{
         while (!procesosProcesando.isEmpty()) {
             Proceso p = procesosProcesando.remove();
             if (p.getPid() == pid) {
+                encontrado = true;
                 System.out.println("\tPID=" + p.getPid() + " | " + p.getNombre() + " | USER:" + p.getPropietario().getAlias() + " UID:" + p.getPropietario().getUid() + " | P=" + p.getPrioridad());
             imprimirEventos(p);
             }
@@ -392,10 +399,14 @@ public class ProcessManagerImpl implements ProcessManager{
             for (int i = 0; i < procesosFinalizados.size(); i++) {
                 Proceso pf = procesosFinalizados.get(i);
                 if(pf.getPid() == pid) {
+                    encontrado = true;
                     System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
-                imprimirEventos(pf);
+                    imprimirEventos(pf);
                 }
             }
+        }
+        if (!encontrado) {
+            System.out.println("ERROR: Proceso no encontrado" );
         }
     }
 }
