@@ -34,8 +34,10 @@ public class ProcessManagerImpl implements ProcessManager{
 
 
     private void escribirLog(String cont){
-        String ruta = "uy/edu/um/log.txt";
-        try (PrintWriter pw = new PrintWriter(new FileWriter(ruta, true))){pw.println(cont);}
+        String ruta = System.getProperty("user.dir") + File.separator + "log.txt";
+        try (PrintWriter pw = new PrintWriter(new FileWriter(ruta, true))){
+            pw.println(cont);
+        }
         catch (IOException e) { throw new RuntimeException(e);}
     }
 
@@ -77,7 +79,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
                 for (int i=0; i < eventos.length; i++){
                     String[] datos = eventos[i].split(":");
-                    Eventos.TipoEvento tipo = Eventos.TipoEvento.valueOf(datos[0]);
+                    Eventos.TipoEvento tipo = Eventos.TipoEvento.valueOf(datos[0].trim());
                     String desc = datos[1];
                     listaEventos.add(new Eventos(tipo, desc));
                 }
@@ -110,7 +112,7 @@ public class ProcessManagerImpl implements ProcessManager{
                     switch (even.getTipoEvento()){
                         case Eventos.TipoEvento.CPU:{cantCPU+=1; break;}
                         case Eventos.TipoEvento.RAM:{cantRAM+=1; break;}
-                        case Eventos.TipoEvento.DISC:{cantDISK+=1;break;}
+                        case Eventos.TipoEvento.DISK:{cantDISK+=1;break;}
 
                     }
                 }

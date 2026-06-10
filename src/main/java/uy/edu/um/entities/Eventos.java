@@ -4,7 +4,7 @@ public class Eventos {
     private TipoEvento tipoEvento;
     private String instrucciones;
     public enum TipoEvento{
-        CPU, RAM, DISC
+        CPU, RAM, DISK
     }
     public Eventos(TipoEvento tipo, String instrucciones){
         this.tipoEvento = tipo;
