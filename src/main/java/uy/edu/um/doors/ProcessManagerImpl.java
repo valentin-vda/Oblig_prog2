@@ -18,6 +18,7 @@ import uy.edu.um.tad.stack.MyStackImpl;
 
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -33,7 +34,8 @@ public class ProcessManagerImpl implements ProcessManager{
 
 
     private void escribirLog(String cont){
-        String ruta = System.getProperty("user.dir") + File.separator + "log.txt";
+        String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String ruta = System.getProperty("user.dir") + File.separator + "log_"+fecha+".txt";
         try (PrintWriter pw = new PrintWriter(new FileWriter(ruta, true))){
             pw.println(cont);
         }
