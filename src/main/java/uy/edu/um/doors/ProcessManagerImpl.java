@@ -27,7 +27,7 @@ public class ProcessManagerImpl implements ProcessManager{
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
     private MyHashImpl<Integer, Usuario> usuarios = new MyHashImpl<>();
     private MyQueueImpl<Proceso> procesosNuevos = new MyQueueImpl();
-    private MyHeapImpl<Proceso> procesosProsesando= new MyHeapImpl<>();
+    private MyHeapImpl<Proceso> procesosProcesando= new MyHeapImpl<>();
     private Proceso running = null;
     private MyStackImpl<Proceso> procesosFinalizados = new MyStackImpl<>();
     private int capacidad_stack_procesos_finalizados = 100;     //CONSULTAR ESTO
@@ -105,7 +105,7 @@ public class ProcessManagerImpl implements ProcessManager{
                 Proceso p = procesosNuevos.dequeue();
                 MyLinkedListImpl<Eventos> e = p.getEventos();
 
-                if (e.size() == 0) throw new ProcesoSinEventos();
+                if (e.isEmpty()) throw new ProcesoSinEventos();
 
                 for (int j=0; j < e.size(); j++){
                     Eventos even = e.get(j);
@@ -123,7 +123,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
                 int prio = ((8*cantCPU + 2*cantRAM + 2*cantDISK)/e.size()) + w*e.size();
                 p.setPrioridad(prio);
-                procesosProsesando.insert(p);
+                procesosProcesando.insert(p);
                 p.setTipoEstado(Proceso.TipoEstado.PENDING);
 
                 String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -139,10 +139,10 @@ public class ProcessManagerImpl implements ProcessManager{
         if (running != null) {
             throw new ProcessAlreadyRunningException(running.getNombre());
         }
-        if (procesosProsesando.isEmpty()){
+        if (procesosProcesando.isEmpty()){
             throw new EmptyQueueException();
         }
-        running = procesosProsesando.remove();
+        running = procesosProcesando.remove();
     }
 
     @Override
@@ -226,7 +226,39 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatus() {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS");
+        System.out.println("EXECUTING:");
+        if (running != null) {
+            System.out.println("\tPID=" + running.getPid() + " | " + running.getNombre() + " | USER:" + running.getPropietario().getAlias() + " UID:" + running.getPropietario().getUid() + " | P=" + running.getPrioridad());
+        }
+        else{
+            System.out.println("\tNo hay procesos en ejecucion");
+        }
+        System.out.println("PENDING:");
+        MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        while (!procesosProcesando.isEmpty()) {
+            Proceso p = procesosProcesando.remove();
+            System.out.println("\tPID=" + p.getPid() + " | " + p.getNombre() + " | USER:" + p.getPropietario().getAlias() + " UID:" + p.getPropietario().getUid()  + " | P=" + p.getPrioridad());
+            aux.push(p);
+        }
+        while (!aux.isEmpty()) {
+            try{
+                procesosProcesando.insert(aux.pop());
+            } catch (EmptyStackException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        System.out.println("FINISHED:");
+        if(procesosFinalizados.isEmpty()){
+            System.out.println("\tNo hay procesos finalizados");
+        }
+        else {
+            for (int i = 0; i < procesosFinalizados.size(); i++) {
+                Proceso pf = procesosFinalizados.get(i);
+                System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
+            }
+        }
+
     }
 
     @Override
