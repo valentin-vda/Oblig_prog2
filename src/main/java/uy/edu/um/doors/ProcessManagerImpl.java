@@ -260,10 +260,50 @@ public class ProcessManagerImpl implements ProcessManager{
         }
 
     }
-
+    //METODO AUXILIAR
+    public void imprimirEventos(Proceso p){
+        MyLinkedListImpl<Eventos> eventos = p.getEventos();
+        for (int i = 0; i < eventos.size(); i++) {
+            Eventos e = eventos.get(i);
+            System.out.println("\t\tEVENT: " + e.getTipoEvento() + " | Instruccions " + e.getInstrucciones());
+        }
+    }
     @Override
     public void printStatusVerbose() {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS");
+        System.out.println("EXECUTING:");
+        if (running != null) {
+            System.out.println("\tPID=" + running.getPid() + " | " + running.getNombre() + " | USER:" + running.getPropietario().getAlias() + " UID:" + running.getPropietario().getUid() + " | P=" + running.getPrioridad());
+            imprimirEventos(running);
+        }
+        else{
+            System.out.println("\tNo hay procesos en ejecucion");
+        }
+        System.out.println("PENDING:");
+        MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        while (!procesosProcesando.isEmpty()) {
+            Proceso p = procesosProcesando.remove();
+            System.out.println("\tPID=" + p.getPid() + " | " + p.getNombre() + " | USER:" + p.getPropietario().getAlias() + " UID:" + p.getPropietario().getUid()  + " | P=" + p.getPrioridad());
+            imprimirEventos(p);
+            aux.push(p);}
+        while (!aux.isEmpty()) {
+            try{
+                procesosProcesando.insert(aux.pop());
+            } catch (EmptyStackException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        System.out.println("FINISHED:");
+        if(procesosFinalizados.isEmpty()){
+            System.out.println("\tNo hay procesos finalizados");
+        }
+        else {
+            for (int i = 0; i < procesosFinalizados.size(); i++) {
+                Proceso pf = procesosFinalizados.get(i);
+                System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
+                imprimirEventos(pf);
+            }
+        }
     }
 
     @Override
