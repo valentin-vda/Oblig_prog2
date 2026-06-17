@@ -257,7 +257,8 @@ public class ProcessManagerImpl implements ProcessManager{
             System.out.println("\tNo hay procesos finalizados");
         }
         else {
-            for (int i = 0; i < procesosFinalizados.size(); i++) {
+            int fin = procesosFinalizados.size();
+            for (int i = 0; i < fin; i++) {
                 Proceso pf = procesosFinalizados.get(i);
                 System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
             }
@@ -303,7 +304,8 @@ public class ProcessManagerImpl implements ProcessManager{
             System.out.println("\tNo hay procesos finalizados");
         }
         else {
-            for (int i = 0; i < procesosFinalizados.size(); i++) {
+            int fin = procesosFinalizados.size();
+            for (int i = 0; i < fin; i++) {
                 Proceso pf = procesosFinalizados.get(i);
                 System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
                 imprimirEventos(pf);
@@ -351,7 +353,8 @@ public class ProcessManagerImpl implements ProcessManager{
             System.out.println("\tNo hay procesos finalizados");
         }
         else {
-            for (int i = 0; i < procesosFinalizados.size(); i++) {
+            int fin = procesosFinalizados.size();
+            for (int i = 0; i < fin; i++) {
                 Proceso pf = procesosFinalizados.get(i);
                 if(pf.getPropietario().getUid() == uid) {
                     System.out.println("\tPID=" + pf.getPid() + " " + pf.getNombre() + " | STATE:" + pf.getTipoFinalizacion() + " | USER:" + pf.getPropietario().getAlias() + " UID:" + pf.getPropietario().getUid());
