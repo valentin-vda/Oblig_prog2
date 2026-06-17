@@ -404,7 +404,8 @@ public class ProcessManagerImpl implements ProcessManager{
             System.out.println("\tNo hay procesos finalizados");
         }
         else {
-            for (int i = 0; i < procesosFinalizados.size(); i++) {
+            int fin = procesosFinalizados.size();
+            for (int i = 0; i < fin; i++) {
                 Proceso pf = procesosFinalizados.get(i);
                 if(pf.getPid() == pid) {
                     encontrado = true;
