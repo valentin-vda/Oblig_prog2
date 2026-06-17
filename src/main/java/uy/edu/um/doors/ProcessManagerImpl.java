@@ -98,7 +98,8 @@ public class ProcessManagerImpl implements ProcessManager{
     @Override
     public void prepareProcesses() throws EmptyQueueException, ProcesoSinEventos{
         if (!procesosNuevos.isEmpty()) {
-            for (int i = 0; i < procesosNuevos.size(); i++) {
+            int pro = procesosNuevos.size();
+            for (int i = 0; i < pro; i++) {
                 int cantCPU = 0;
                 int cantRAM = 0;
                 int cantDISK = 0;
@@ -108,7 +109,8 @@ public class ProcessManagerImpl implements ProcessManager{
 
                 if (e.isEmpty()) throw new ProcesoSinEventos();
 
-                for (int j=0; j < e.size(); j++){
+                int cant = e.size();
+                for (int j=0; j < cant; j++){
                     Eventos even = e.get(j);
                     switch (even.getTipoEvento()){
                         case Eventos.TipoEvento.CPU:{cantCPU+=1; break;}
@@ -122,7 +124,7 @@ public class ProcessManagerImpl implements ProcessManager{
                 else {w = 16;}
 
 
-                int prio = ((8*cantCPU + 2*cantRAM + 2*cantDISK)/e.size()) + w*e.size();
+                int prio = ((8*cantCPU + 2*cantRAM + 2*cantDISK)/cant) + w*cant;
                 p.setPrioridad(prio);
                 procesosProcesando.insert(p);
                 p.setTipoEstado(Proceso.TipoEstado.PENDING);
