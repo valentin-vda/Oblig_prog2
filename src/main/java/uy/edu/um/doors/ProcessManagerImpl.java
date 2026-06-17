@@ -219,7 +219,7 @@ public class ProcessManagerImpl implements ProcessManager{
         //Va imprimiendo en el log los procesos
         for (int i=0; i < total ; i++) {
             Proceso aux = procesosFinalizados.pop();
-            String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
+            String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+ " | " + "STATE:"+aux.getTipoFinalizacion()+
                     "USER:"+aux.getPropietario().getTipo()+" UID:"+aux.getPropietario().getUid()+"";
             escribirLog(logaux);
 
