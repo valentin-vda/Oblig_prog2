@@ -267,7 +267,8 @@ public class ProcessManagerImpl implements ProcessManager{
     //METODO AUXILIAR
     public void imprimirEventos(Proceso p){
         MyLinkedListImpl<Eventos> eventos = p.getEventos();
-        for (int i = 0; i < eventos.size(); i++) {
+        int espacio = eventos.size();
+        for (int i = 0; i < espacio; i++) {
             Eventos e = eventos.get(i);
             System.out.println("\t\tEVENT: " + e.getTipoEvento() + " | Instruccions " + e.getInstrucciones());
         }
