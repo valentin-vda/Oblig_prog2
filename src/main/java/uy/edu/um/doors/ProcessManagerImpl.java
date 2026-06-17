@@ -215,8 +215,9 @@ public class ProcessManagerImpl implements ProcessManager{
     public void printProcesosFinalizados() throws EmptyStackException {
         String fechaHora = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         escribirLog(fechaHora+": Finished process stack overflow");
+        int total = procesosFinalizados.size();
         //Va imprimiendo en el log los procesos
-        for (int i=0; i < procesosFinalizados.size(); i++) {
+        for (int i=0; i < total ; i++) {
             Proceso aux = procesosFinalizados.pop();
             String logaux = "PID="+aux.getPid()+" | "+aux.getNombre()+" | " + " | " + "STATE:"+aux.getTipoFinalizacion()+
                     "USER:"+aux.getPropietario().getTipo()+" UID:"+aux.getPropietario().getUid()+"";
