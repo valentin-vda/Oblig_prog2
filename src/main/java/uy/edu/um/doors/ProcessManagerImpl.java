@@ -171,7 +171,7 @@ public class ProcessManagerImpl implements ProcessManager{
     @Override
     public void finishProcessError() throws EmptyStackException {
         if (running == null) {
-            throw new NingunProcesoEnEjecucion("");
+            throw new NingunProcesoEnEjecucion("No hay ningun proceso en ejecución");
         }
         Proceso terminadoE = running;
         terminadoE.setTipoFinalizacion(Proceso.TipoFinalizacion.ERROR);
@@ -191,7 +191,7 @@ public class ProcessManagerImpl implements ProcessManager{
     @Override
     public void terminateProcess(int uid) throws EmptyStackException {
         if (running == null) {
-            throw new NingunProcesoEnEjecucion("");
+            throw new NingunProcesoEnEjecucion("No hay ningun proceso en ejecución");
         }
         Proceso terminated = running;
         terminated.setTipoFinalizacion(Proceso.TipoFinalizacion.TERMINATED);
@@ -240,6 +240,7 @@ public class ProcessManagerImpl implements ProcessManager{
         }
         System.out.println("PENDING:");
         MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        if (procesosProcesando.isEmpty()) System.out.println("\tNo hay procesos pendientes");
         while (!procesosProcesando.isEmpty()) {
             Proceso p = procesosProcesando.remove();
             System.out.println("\tPID=" + p.getPid() + " | " + p.getNombre() + " | USER:" + p.getPropietario().getAlias() + " UID:" + p.getPropietario().getUid()  + " | P=" + p.getPrioridad());
@@ -287,6 +288,7 @@ public class ProcessManagerImpl implements ProcessManager{
         }
         System.out.println("PENDING:");
         MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        if (procesosProcesando.isEmpty()) System.out.println("\tNo hay procesos pendientes");
         while (!procesosProcesando.isEmpty()) {
             Proceso p = procesosProcesando.remove();
             System.out.println("\tPID=" + p.getPid() + " | " + p.getNombre() + " | USER:" + p.getPropietario().getAlias() + " UID:" + p.getPropietario().getUid()  + " | P=" + p.getPrioridad());
@@ -334,6 +336,7 @@ public class ProcessManagerImpl implements ProcessManager{
         }
         System.out.println("PENDING:");
         MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        if (procesosProcesando.isEmpty()) System.out.println("\tNo hay procesos pendientes");
         while (!procesosProcesando.isEmpty()) {
             Proceso p = procesosProcesando.remove();
             if (p.getPropietario().getUid() == uid) {
@@ -383,6 +386,7 @@ public class ProcessManagerImpl implements ProcessManager{
         }
         System.out.println("PENDING:");
         MyStackImpl<Proceso> aux = new MyStackImpl<>();
+        if (procesosProcesando.isEmpty()) System.out.println("\tNo hay procesos pendientes");
         while (!procesosProcesando.isEmpty()) {
             Proceso p = procesosProcesando.remove();
             if (p.getPid() == pid) {
