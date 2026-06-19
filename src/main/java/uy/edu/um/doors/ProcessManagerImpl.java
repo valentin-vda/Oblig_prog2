@@ -11,6 +11,7 @@ import uy.edu.um.exceptions.UsuarioNoEncontrado;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.list.MyLinkedListImpl;
+import uy.edu.um.tad.list.Node;
 import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.EmptyStackException;
@@ -269,12 +270,14 @@ public class ProcessManagerImpl implements ProcessManager{
     //METODO AUXILIAR
     public void imprimirEventos(Proceso p){
         MyLinkedListImpl<Eventos> eventos = p.getEventos();
-        int espacio = eventos.size();
-        for (int i = 0; i < espacio; i++) {
-            Eventos e = eventos.get(i);
+        Node<Eventos> actual = eventos.getFirst();
+        while (actual != null) {
+            Eventos e = actual.getValue();
             System.out.println("\t\tEVENT: " + e.getTipoEvento() + " | Instruccions " + e.getInstrucciones());
+            actual = actual.getNext();
         }
     }
+
     @Override
     public void printStatusVerbose() {
         System.out.println("PROCESS STATUS");
